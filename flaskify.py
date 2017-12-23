@@ -2,7 +2,7 @@ import click
 import os
 
 ''' 
-CLI rebuild: pip3 install --editable .
+CLI rebuild: pip3 install -e .
 '''
 
 @click.group()
