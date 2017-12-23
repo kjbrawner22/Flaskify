@@ -7,6 +7,11 @@ Command Line Interface for common Flask operations
 	- `pip3 install -e .` (e flag signals development mode).
 		- Note: after every change to the source code, you must run this command again.
 		- Note: I have not tried this with python2. Please let me know if it works or if it needs some changes.
+	#### ---OR---
+	- [Go to releases page](https://github.com/kjbrawner22/Flaskify/releases/tag/0.1.dev1)
+	- Download latest .whl file
+	- Locate file in cmd or terminal
+	- Run `pip3 install ` with wheel name appended.
 2. Usage
 	- `flaskify generate project`
 		- This generates a project structure for an easily-scalable Flask app.
