@@ -2,6 +2,7 @@
 Command Line Interface for common Flask operations
 
 1. Installation
+	- Prerequisites: have python3, pip3, and venv installed. Then run the next commands.
 	- `git clone https://github.com/kjbrawner22/Flaskify.git`
 	- `cd Flaskify`
 	- `pip3 install -e .` (e flag signals development mode).

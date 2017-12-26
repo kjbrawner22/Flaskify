@@ -12,8 +12,9 @@ def cli():
 @cli.command()
 def run():
 	if os.path.isfile('run.py'):
-		os.system('export FLASK_APP=run.py')
-		os.system('venv/bin/flask run')
+		os.system(
+			'export FLASK_APP=run.py\n'
+			'venv/bin/flask run')
 	else:
 		click.echo('Cannot find \'run.py\'')
 
