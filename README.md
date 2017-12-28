@@ -13,10 +13,11 @@ Command Line Interface for common Flask operations
 	- Download latest .whl file
 	- Locate file in cmd or terminal
 	- Run `pip3 install ` with wheel name appended.
-2. Usage
+2. Usage:
 	- `flaskify generate project`
 		- This generates a project structure for an easily-scalable Flask app.
 		- prompts you for the project name.
+		- All other commands should be run under the root directory created by this command.
 	- `flaskify generate route`
 		- This adds a route to the routes.py file, and generates corresponding html/css files.
 		- prompts you for route name and html/css name (w/o extensions).

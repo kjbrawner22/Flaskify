@@ -1,9 +1,13 @@
 import click
 import os
+from json import load,dump
+from utils import load_config
 
 ''' 
 CLI rebuild: pip3 install -e .
 '''
+
+cfg = load_config()
 
 @click.group()
 def cli():
@@ -11,20 +15,43 @@ def cli():
 
 @cli.command()
 def run():
-	if os.path.isfile('run.py'):
+	if os.path.isfile(cfg['FLASK_APP']):
 		os.system(
-			'export FLASK_APP=run.py\n'
-			'venv/bin/flask run')
+			'export FLASK_APP=%s\n%s/flask run'
+			% (cfg['FLASK_APP'], cfg['VENV_PATH']))
 	else:
-		click.echo('Cannot find \'run.py\'')
+		click.echo('Cannot find \'%s\'' % cfg['FLASK_APP'])
+
+@cli.command()
+@click.option('--FLASK_APP',
+	          default='',
+	          help='FLASK_APP variable for Flask')
+@click.option('--VENV_PATH',
+	          default='',
+	          help='Path to virtual environment')
+@click.option('--ROUTES',
+	          default='',
+	          help='Path to routes file. Set to None if not a separate module')
+def config(flask_app,venv_path,routes):
+	if flask_app != '':
+		cfg['FLASK_APP'] = flask_app
+	if venv_path != '':
+		cfg['VENV_PATH'] = venv_path
+	if routes != '':
+		cfg['ROUTES'] = routes
+	with open('flaskify_config.json', "w+") as file:
+		if load(file) != cfg:
+			dump(cfg, file)
+			click.echo('Configuration successfully changed.')
 
 @cli.group()
 def generate():
 	pass
 
 @generate.command()
-@click.option('--name', prompt='project folder name',
-				 help='Project folder name: No spaces')
+@click.option('--name', '-n',
+	          prompt='project folder name',
+			  help='Project folder name: No spaces')
 def project(name):
 	click.echo('Generating project...')
 	os.makedirs(name)
@@ -36,6 +63,7 @@ def project(name):
 	os.makedirs(name + '/app/static/css')
 	routes = open(name + "/app/routes.py", "w+")
 	config = open(name + "/config.py", "w+")
+	flaskify_config = open(name + "/flaskify_config.py")
 	run = open(name + "/run.py", "w+")
 	init = open(name + "/app/__init__.py", "w+")
 	index_html = open(name + "/app/templates/index.html", "w+")
@@ -58,6 +86,8 @@ def project(name):
 		"SECRET_KEY = %s" % os.urandom(24)
 	)
 
+	dump(cfg, flaskify_config)
+
 	routes.write(
 		"from app import app\n"
 		"from flask import render_template\n\n"
@@ -77,6 +107,7 @@ def project(name):
 
 	routes.close()
 	config.close()
+	flaskify_config.close()
 	run.close()
 	init.close()
 	index_html.close()
@@ -107,4 +138,9 @@ def route(name, template_name):
 		css.close()
 	else:
 		click.echo('cannot find \'app/routes.py\'')
+
+@generate.command()
+def venv():
+	click.echo('Generating virtual environment...')
+	os.system('python3 -m venv %s' % cfg['VENV_PATH'])
 		
