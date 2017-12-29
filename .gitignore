@@ -1,2 +1,4 @@
 __pycache__/
 flaskify.egg-info/
+build/
+dist/
