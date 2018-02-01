@@ -21,16 +21,12 @@ def run():
 	else:
 		click.echo('Cannot find \'%s\'' % cfg['FLASK_APP'])
 
-@cli.group()
-def generate():
-	pass
-
-@generate.command()
+@cli.command()
 @click.option('--name', '-n',
 	          prompt='project folder name',
 			  help='Project folder name: No spaces')
-def project(name):
-	click.echo('Generating project...')
+def new(name):
+	click.echo('Creating new project...')
 	os.makedirs(name)
 	os.system('python3 -m venv %s/venv' % name)
 	os.system('%s/venv/bin/pip3 install wheel' % name)
@@ -39,12 +35,16 @@ def project(name):
 	os.makedirs(name + '/app/templates')
 	os.makedirs(name + '/app/static')
 	os.makedirs(name + '/app/static/css')
+	os.makedirs(name + '/app/static/scss')
 	routes = open(name + "/app/routes.py", "w+")
 	config = open(name + "/config.py", "w+")
 	run = open(name + "/run.py", "w+")
 	init = open(name + "/app/__init__.py", "w+")
+	base_html = open(name + "/app/templates/base.html", "w+")
 	index_html = open(name + "/app/templates/index.html", "w+")
+	base_css = open(name + "/app/static/css/base.css", "w+")
 	index_css = open(name + "/app/static/css/index.css", "w+")
+
 
 	init.write(
 		"from flask import Flask\n\n"
@@ -67,49 +67,60 @@ def project(name):
 		"from app import app\n"
 		"from flask import render_template\n\n"
 		"@app.route('/')\n"
-		"@app.route('/index')\n #optional"
+		"@app.route('/index')\n"
 		"def index():\n"
 		"\treturn render_template('index.html')"
 	)
 
-	index_html.write(
+	base_html.write(
 		"<head>\n"
-		"\t<title>Placeholder title</title>\n"
+		"\t{% if title %}\n"
+		"\t\t<title>{{ title }}</title>\n"
+		"\t{% else %}\n"
+		"\t\t<title>No title assigned</title>\n"
+		"\t{% endif %}\n"
 		'\t<meta name="viewport" content="width=device-width, initial-scale=1.0">\n'
-		"\t<link href=\"{{ url_for(\'static\', filename=\'css/index.css\') }}\" rel=\"stylesheet\">\n"
-		"</head>"
+		"\t<link href=\"{{ url_for(\'static\', filename=\'css/base.css\') }}\" rel=\"stylesheet\">\n"
+		"\t{% block head %}{% endblock %}\n"
+		"</head>\n\n"
+		"<body>\n"
+		"\t<div class=\"nav\">\n"
+		"\t\t<a class=\"nav-item\" href=\"\">\n"
+		"\t\t\t<p></p>\n"
+		"\t\t</a>\n"
+		"\t</div>\n"
+		"\t{% block body %}{% endblock %}"
+		"</body>"
+	)
+
+	index_html.write("{% extends 'base.html' %}")
+	base_css.write(
+		".nav {\n"
+		"\tdisplay: grid;\n"
+		"\tgrid-template-columns: repeat(4, 1fr);\n"
+		"\theight: auto;\n"
+		"\tposition: sticky;\n"
+		"\ttop: 0;\n"
+		"\tbackground-color: rgba(255,255,255,.3);\n"
+		"}\n\n"
+		".nav-item {\n"
+		"\ttext-align: center;\n"
+		"\ttext-decoration: none;\n"
+		"\tcolor: inherit;\n"
+		"}\n\n"
+		".nav-item:hover {\n"
+		"\tcolor: rgba(0,0,0,.3);\n"
+		"}\n\n"
+		".nav-item:focus {\n"
+		"\toutline: none;\n"
+		"}"
 	)
 
 	routes.close()
 	config.close()
-	flaskify_config.close()
 	run.close()
 	init.close()
+	base_html.close()
 	index_html.close()
+	base_css.close()
 	index_css.close()
-
-@generate.command()
-@click.option('--name', prompt='route name')
-@click.option('--template_name', prompt='html template name')
-def route(name, template_name):
-	string = "\n\n@app.route('/%s')\n" % name
-	string += "def %s():\n\treturn render_template('%s.html')\n" % (name,name)
-	if os.path.isfile(cfg['ROUTES']):
-		f = open(cfg['ROUTES'], 'a+')
-		html = open('app/templates/' + template_name + '.html', "w+")
-		css = open('app/static/css/' + template_name + '.css', "w+")
-		
-		f.write(string)
-		html.write(
-			"<head>\n"
-			"\t<title>Placeholder title</title>\n"
-			'\t<meta name="viewport" content="width=device-width, initial-scale=1.0">\n'
-			"\t<link href=\"{{ url_for(\'static\', filename=\'css/" + template_name + ".css\') }}\" rel=\"stylesheet\">\n"
-			"</head>"
-		)
-
-		f.close()
-		html.close()
-		css.close()
-	else:
-		click.echo('cannot find \'app/routes.py\'')
