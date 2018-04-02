@@ -11,13 +11,10 @@ Command Line Interface for common Flask operations
 	#### ---OR---
 	- Simply Run `pip3 install flaskify` to install from PyPI.
 2. Usage:
-	- `flaskify generate project`
+	- `flaskify new`
 		- This generates a project structure for an easily-scalable Flask app.
 		- prompts you for the project name.
 		- All other commands should be run under the root directory created by this command.
-	- `flaskify generate route`
-		- This adds a route to the routes.py file, and generates corresponding html/css files.
-		- prompts you for route name and html/css name (w/o extensions).
 	- `flaskify run`
 		- combines the `export FLASK_APP=run.py` and `flask run` into 1 step.
 3. Contribution
